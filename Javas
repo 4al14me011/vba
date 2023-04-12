@@ -20,12 +20,22 @@ Sub AddPageNumbers()
     acrobatDoc.Open "C:\path\to\your\document.pdf", "Acrobat"
     
     'Get the number of pages in the document
-    numPages = acrobatDoc.GetNumPages
+    numPages = acrobatDoc.GetPDDoc.GetNumPages
     
     'Loop through each page and add the page number
     For i = 0 To numPages - 1
-        acrobatDoc.GoToPage i
-        acrobatDoc.PrintPagesSilent i, i, "p" & (i + pageNumStart) & pageNumPrefix & (i + pageNumStart) & pageNumSuffix
+        acrobatDoc.GetAVPageView.GoTo i
+        Dim printInfo As String
+        printInfo = "mPrinterName=Adobe PDF" & vbNewLine & _
+                    "bUI=0" & vbNewLine & _
+                    "bShrinkToFit=1" & vbNewLine & _
+                    "bSuppressCenter=1" & vbNewLine & _
+                    "bSuppressRotatePages=1" & vbNewLine & _
+                    "bSuppressColor=1" & vbNewLine & _
+                    "bSuppressDiagnostics=1" & vbNewLine & _
+                    "nStartPage=" & (i + pageNumStart) & vbNewLine & _
+                    "sComment=" & pageNumPrefix & (i + pageNumStart) & pageNumSuffix
+        acrobatDoc.PrintPagesSilent i, i, printInfo
     Next i
     
     'Close the document and quit Acrobat
