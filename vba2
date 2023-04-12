@@ -25,8 +25,8 @@ Sub FindReplaceInPDF()
         Set AcroPDDoc = AcroAVDoc.GetPDDoc()
         
         ' Search for the text in the PDF file
-        Set AcroTextSelect = CreateObject("AcroExch.PDTextSelect")
-        If AcroTextSelect.Create(AcroPDDoc, 0, SearchString, False, False) Then
+        Set AcroTextSelect = AcroPDDoc.CreatePageHilite(0, AcroPDDoc.GetNumPages() - 1)
+        If AcroTextSelect.Find(SearchString, False, False) Then
             ' Loop through all instances of the text in the PDF file
             Do While AcroTextSelect.FindNext()
                 ' Highlight the text
