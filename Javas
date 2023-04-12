@@ -1,28 +1,36 @@
-// Get the document object
-var doc = this;
-
-// Get the number of pages in the document
-var pageCount = doc.numPages;
-
-// Loop through each page
-for (var i = 0; i < pageCount; i++) {
-  // Get the page object
-  var page = doc.getPageNth(i);
-
-  // Create the page number text field
-  var pageNumberField = "Page " + (i+1) + " of " + pageCount;
-  var pageNumberRect = [520, 10, 580, 30]; // Adjust the position and size as needed
-  var pageNumber = doc.addField(page, "PageNumber" + i, "text", pageNumberRect);
-
-  // Set the page number field properties
-  pageNumber.delay = true;
-  pageNumber.display = display.visible;
-  pageNumber.value = pageNumberField;
-  pageNumber.textSize = 10;
-  pageNumber.textFont = font.HelvB;
-  pageNumber.alignment = "center";
-  pageNumber.readonly = true;
-
-  // Redraw the page to display the page number field
-  page.invalidate();
-}
+Sub AddPageNumbers()
+    'Declare variables
+    Dim acrobatApp As Object
+    Dim acrobatDoc As Object
+    Dim pageNumStart As Integer
+    Dim pageNumPrefix As String
+    Dim pageNumSuffix As String
+    Dim numPages As Integer
+    Dim i As Integer
+    
+    'Set the page numbering options
+    pageNumStart = 1 'Starting page number
+    pageNumPrefix = "Page " 'Prefix for page numbers (optional)
+    pageNumSuffix = "" 'Suffix for page numbers (optional)
+    
+    'Create a new instance of Acrobat
+    Set acrobatApp = CreateObject("AcroExch.App")
+    acrobatApp.Show
+    Set acrobatDoc = CreateObject("AcroExch.AVDoc")
+    acrobatDoc.Open "C:\path\to\your\document.pdf", "Acrobat"
+    
+    'Get the number of pages in the document
+    numPages = acrobatDoc.GetNumPages
+    
+    'Loop through each page and add the page number
+    For i = 0 To numPages - 1
+        acrobatDoc.GoToPage i
+        acrobatDoc.PrintPagesSilent i, i, "p" & (i + pageNumStart) & pageNumPrefix & (i + pageNumStart) & pageNumSuffix
+    Next i
+    
+    'Close the document and quit Acrobat
+    acrobatDoc.Close True
+    acrobatApp.Exit
+    Set acrobatDoc = Nothing
+    Set acrobatApp = Nothing
+End Sub
