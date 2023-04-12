@@ -1,0 +1,28 @@
+// Get the document object
+var doc = this;
+
+// Get the number of pages in the document
+var pageCount = doc.numPages;
+
+// Loop through each page
+for (var i = 0; i < pageCount; i++) {
+  // Get the page object
+  var page = doc.getPageNth(i);
+
+  // Create the page number text field
+  var pageNumberField = "Page " + (i+1) + " of " + pageCount;
+  var pageNumberRect = [520, 10, 580, 30]; // Adjust the position and size as needed
+  var pageNumber = doc.addField(page, "PageNumber" + i, "text", pageNumberRect);
+
+  // Set the page number field properties
+  pageNumber.delay = true;
+  pageNumber.display = display.visible;
+  pageNumber.value = pageNumberField;
+  pageNumber.textSize = 10;
+  pageNumber.textFont = font.HelvB;
+  pageNumber.alignment = "center";
+  pageNumber.readonly = true;
+
+  // Redraw the page to display the page number field
+  page.invalidate();
+}
