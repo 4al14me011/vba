@@ -20,31 +20,30 @@ Sub FindReplaceInPDF()
     Set AcroApp = CreateObject("AcroExch.App")
     
     ' Open the PDF file you want to work with
-    Set AcroAVDoc = CreateObject("AcroExch.AVDoc")
-    If AcroAVDoc.Open("C:\Path\To\Your\Document.pdf", "") Then
-        Set AcroPDDoc = AcroAVDoc.GetPDDoc()
-        
-        ' Search for the text in the PDF file
-        Set AcroTextSelect = AcroPDDoc.CreateTextSelect(0, 0)
-        If AcroTextSelect.FindText(SearchString, False, False) Then
-            ' Loop through all instances of the text in the PDF file
-            Do While AcroTextSelect.FindNext()
-                ' Highlight the text
-                Set AcroHiliteList = AcroTextSelect.GetHiliteList()
-                For i = 0 To AcroHiliteList.GetCount() - 1
-                    Set AcroRect = AcroHiliteList.GetRect(i)
-                    Set AcroPoint = AcroRect.BottomRight
-                    
-                    ' Replace the text
-                    AcroTextSelect.Replace(ReplaceString)
-                Next
-            Loop
-        End If
-        
-        ' Clean up
-        AcroPDDoc.Close
+    Set AcroAVDoc = AcroApp.GetActiveDoc()
+    Set AcroPDDoc = AcroAVDoc.GetPDDoc()
+    
+    ' Search for the text in the PDF file
+    Set AcroTextSelect = CreateObject("AcroExch.PDTextSelect")
+    AcroTextSelect.SelectAll()
+    If AcroTextSelect.FindText(SearchString, 0, 0) Then
+        ' Loop through all instances of the text in the PDF file
+        Do While AcroTextSelect.FindNext()
+            ' Highlight the text
+            Set AcroHiliteList = AcroTextSelect.GetHiliteList()
+            For i = 0 To AcroHiliteList.GetCount() - 1
+                Set AcroRect = AcroHiliteList.GetRect(i)
+                Set AcroPoint = AcroRect.BottomRight
+                
+                ' Replace the text
+                AcroTextSelect.Replace(ReplaceString)
+            Next
+        Loop
     End If
-    AcroAVDoc.Close (True)
+    
+    ' Clean up
+    AcroPDDoc.Save 1, ""
+    AcroAVDoc.Close True
     AcroApp.Exit
     
 End Sub
