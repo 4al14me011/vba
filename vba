@@ -4,7 +4,6 @@ Sub FindReplaceInPDF()
     Dim AcroApp As Acrobat.CAcroApp
     Dim AcroAVDoc As Acrobat.CAcroAVDoc
     Dim AcroPDDoc As Acrobat.CAcroPDDoc
-    Dim AcroHiliteList As Acrobat.CAcroHiliteList
     Dim AcroTextSelect As Acrobat.CAcroPDTextSelect
     Dim AcroRect As Acrobat.CAcroRect
     Dim AcroPoint As Acrobat.CAcroPoint
@@ -26,25 +25,25 @@ Sub FindReplaceInPDF()
         
         ' Search for the text in the PDF file
         Set AcroTextSelect = AcroPDDoc.CreateTextSelect(0, 0)
-        If AcroTextSelect.FindText(SearchString, False, False) Then
+        If AcroTextSelect.Find(SearchString, False, False) Then
             ' Loop through all instances of the text in the PDF file
             Do While AcroTextSelect.FindNext()
                 ' Highlight the text
-                Set AcroHiliteList = AcroTextSelect.GetHiliteList()
-                For i = 0 To AcroHiliteList.GetCount() - 1
-                    Set AcroRect = AcroHiliteList.GetRect(i)
-                    Set AcroPoint = AcroRect.BottomRight
-                    
-                    ' Replace the text
-                    AcroTextSelect.Replace(ReplaceString)
-                Next
+                Set AcroRect = AcroTextSelect.GetBoundingRect()
+                Set AcroPoint = AcroRect.BottomRight
+                AcroRect.Left = AcroRect.Left + 1
+                AcroRect.Right = AcroRect.Right + 1
+                AcroTextSelect.AddHighlightEx AcroRect, 1
+                
+                ' Replace the text
+                AcroTextSelect.Replace(ReplaceString)
             Loop
         End If
         
         ' Clean up
-        AcroPDDoc.Close
+        AcroPDDoc.Save 1, ""
+        AcroAVDoc.Close True
     End If
-    AcroAVDoc.Close (True)
     AcroApp.Exit
     
 End Sub
