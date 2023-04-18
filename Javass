@@ -1,6 +1,6 @@
-Sub ConvertImageToPDF()
+Sub AddImageToWordDoc()
 
-    ' Select the image file to convert
+    ' Select the image file to add
     Dim strImagePath As String
     strImagePath = Application.GetOpenFilename("Image Files (*.jpg;*.jpeg;*.png;*.bmp),*.jpg;*.jpeg;*.png;*.bmp")
     
@@ -10,56 +10,19 @@ Sub ConvertImageToPDF()
         Exit Sub
     End If
     
-    ' Open the image file
-    Dim objImageDoc As Acrobat.CAcroPDDoc
-    Set objImageDoc = CreateObject("AcroExch.PDDoc")
-    If objImageDoc.Open(strImagePath) Then
+    ' Create a new Word document
+    Dim objWord As Object
+    Set objWord = CreateObject("Word.Application")
+    objWord.Visible = True
+    Dim objDoc As Object
+    Set objDoc = objWord.Documents.Add
     
-        ' Create a new PDF file
-        Dim objPDFDoc As Acrobat.CAcroPDDoc
-        Set objPDFDoc = CreateObject("AcroExch.PDDoc")
-        If objPDFDoc.Create Then
-        
-            ' Get the page size of the image
-            Dim objImagePage As Acrobat.CAcroPDPage
-            Set objImagePage = objImageDoc.GetPage(0)
-            Dim dblWidth As Double
-            Dim dblHeight As Double
-            dblWidth = objImagePage.GetSize(0)
-            dblHeight = objImagePage.GetSize(1)
-            
-            ' Calculate the scaling factor to fit the image to A4 size
-            Dim dblScaleFactor As Double
-            If dblWidth > dblHeight Then
-                dblScaleFactor = 210 / dblWidth
-            Else
-                dblScaleFactor = 297 / dblHeight
-            End If
-            
-            ' Resize the image to A4 size
-            objImagePage.ResizePages 0, 0, dblScaleFactor
-            
-            ' Create a new page in the PDF file
-            Dim objPDFPage As Acrobat.CAcroPDPage
-            Set objPDFPage = objPDFDoc.CreatePage(0, 210, 297)
-            
-            ' Add the image to the PDF page
-            Dim objPDFContent As Acrobat.CAcroPDContent
-            Set objPDFContent = objPDFPage.Contents
-            Dim objImage As Acrobat.CAcroPDXObject
-            Set objImage = CreateObject("AcroExch.PDXObject")
-            objImage.CreateFromFile strImagePath
-            objPDFContent.AppendXObject objImage
-            
-            ' Save the PDF file
-            Dim strPDFPath As String
-            strPDFPath = Replace(strImagePath, "." & Right(strImagePath, 3), ".pdf")
-            If objPDFDoc.Save(PDSaveFull, strPDFPath) Then
-                MsgBox "Image converted to PDF successfully."
-            End If
-            
-        End If
-        
-    End If
+    ' Insert the image into the Word document
+    objDoc.InlineShapes.AddPicture Filename:=strImagePath, LinkToFile:=False, SaveWithDocument:=True
     
+    ' Clean up
+    Set objDoc = Nothing
+    objWord.Quit
+    Set objWord = Nothing
+
 End Sub
