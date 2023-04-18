@@ -1,36 +1,65 @@
-Sub AddPageNumbers()
-    'Declare variables
-    Dim acrobatApp As Object
-    Dim acrobatDoc As Object
-    Dim pageNumStart As Integer
-    Dim pageNumPrefix As String
-    Dim pageNumSuffix As String
-    Dim numPages As Integer
-    Dim i As Integer
+Sub ConvertImageToPDF()
+
+    ' Select the image file to convert
+    Dim strImagePath As String
+    strImagePath = Application.GetOpenFilename("Image Files (*.jpg;*.jpeg;*.png;*.bmp),*.jpg;*.jpeg;*.png;*.bmp")
     
-    'Set the page numbering options
-    pageNumStart = 1 'Starting page number
-    pageNumPrefix = "Page " 'Prefix for page numbers (optional)
-    pageNumSuffix = "" 'Suffix for page numbers (optional)
+    ' Check if an image was selected
+    If strImagePath = "False" Then
+        MsgBox "No image file selected."
+        Exit Sub
+    End If
     
-    'Create a new instance of Acrobat
-    Set acrobatApp = CreateObject("AcroExch.App")
-    acrobatApp.Show
-    Set acrobatDoc = CreateObject("AcroExch.AVDoc")
-    acrobatDoc.Open "C:\path\to\your\document.pdf", "Acrobat"
+    ' Open the image file
+    Dim objImageDoc As Acrobat.CAcroPDDoc
+    Set objImageDoc = CreateObject("AcroExch.PDDoc")
+    If objImageDoc.Open(strImagePath) Then
     
-    'Get the number of pages in the document
-    numPages = acrobatDoc.GetPDDoc.GetNumPages
+        ' Create a new PDF file
+        Dim objPDFDoc As Acrobat.CAcroPDDoc
+        Set objPDFDoc = CreateObject("AcroExch.PDDoc")
+        If objPDFDoc.Create Then
+        
+            ' Get the page size of the image
+            Dim objImagePage As Acrobat.CAcroPDPage
+            Set objImagePage = objImageDoc.GetPage(0)
+            Dim dblWidth As Double
+            Dim dblHeight As Double
+            dblWidth = objImagePage.GetSize(0)
+            dblHeight = objImagePage.GetSize(1)
+            
+            ' Calculate the scaling factor to fit the image to A4 size
+            Dim dblScaleFactor As Double
+            If dblWidth > dblHeight Then
+                dblScaleFactor = 210 / dblWidth
+            Else
+                dblScaleFactor = 297 / dblHeight
+            End If
+            
+            ' Resize the image to A4 size
+            objImagePage.ResizePages 0, 0, dblScaleFactor
+            
+            ' Create a new page in the PDF file
+            Dim objPDFPage As Acrobat.CAcroPDPage
+            Set objPDFPage = objPDFDoc.CreatePage(0, 210, 297)
+            
+            ' Add the image to the PDF page
+            Dim objPDFContent As Acrobat.CAcroPDContent
+            Set objPDFContent = objPDFPage.Contents
+            Dim objImage As Acrobat.CAcroPDXObject
+            Set objImage = CreateObject("AcroExch.PDXObject")
+            objImage.CreateFromFile strImagePath
+            objPDFContent.AppendXObject objImage
+            
+            ' Save the PDF file
+            Dim strPDFPath As String
+            strPDFPath = Replace(strImagePath, "." & Right(strImagePath, 3), ".pdf")
+            If objPDFDoc.Save(PDSaveFull, strPDFPath) Then
+                MsgBox "Image converted to PDF successfully."
+            End If
+            
+        End If
+        
+    End If
     
-    'Loop through each page and add the page number
-    For i = 0 To numPages - 1
-        acrobatDoc.GetAVPageView.GoTo i
-        acrobatDoc.PrintPages i, i, "p" & (i + pageNumStart) & pageNumPrefix & (i + pageNumStart) & pageNumSuffix
-    Next i
-    
-    'Close the document and quit Acrobat
-    acrobatDoc.Close True
-    acrobatApp.Exit
-    Set acrobatDoc = Nothing
-    Set acrobatApp = Nothing
 End Sub
