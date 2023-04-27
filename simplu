@@ -1,0 +1,38 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        List<string> myList = new List<string>{ "s", "a", "l", "y", "h", "e" };
+        var combinations = new List<List<string>>();
+        int index = 0
+        
+        if (index == myList.Count)
+        {
+            combinations.Add(buffer.ToList());
+            return;
+        }
+
+        for (int i = 0; i < myList.Count; i++)
+        {
+            if (!buffer.Contains(myList[i]))
+            {
+                buffer.Add(myList[i]);
+                GenerateCombinations(myList, index + 1, buffer, combinations);
+                buffer.RemoveAt(buffer.Count - 1);
+            }
+        }
+        
+        
+        
+        combinations = GenerateCombinations(myList, 0, new List<string>(), combinations);
+
+        foreach (var combination in combinations)
+        {
+            Console.WriteLine(string.Join(",", combination));
+        }
+    }
+}
