@@ -24,13 +24,17 @@ Function GetCombinations(ByVal list As Variant) As Variant
     head = list(LBound(list))
     
     Dim tail As Variant
-    tail = Mid(list, LBound(list) + 1)
+    ReDim tail(n - 2)
+    Dim i As Integer
+    For i = LBound(tail) To UBound(tail)
+        tail(i) = list(i + 1)
+    Next i
     
     Dim tailCombinations As Variant
     tailCombinations = GetCombinations(tail)
     
     Dim result As Variant
-    ReDim result(UBound(tailCombinations) * (n - 1))
+    ReDim result(UBound(tailCombinations) * n)
     
     Dim k As Integer
     k = 0
@@ -42,7 +46,7 @@ Function GetCombinations(ByVal list As Variant) As Variant
         
         For j = 0 To UBound(tailCombination) + 1
             Dim combination As Variant
-            ReDim combination(UBound(tailCombination) + 1)
+            ReDim combination(n - 1)
             
             Dim l As Integer
             For l = 0 To j - 1
