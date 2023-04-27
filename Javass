@@ -1,28 +1,42 @@
-Sub AddImageToWordDoc()
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-    ' Select the image file to add
-    Dim strImagePath As String
-    strImagePath = Application.GetOpenFilename("Image Files (*.jpg;*.jpeg;*.png;*.bmp),*.jpg;*.jpeg;*.png;*.bmp")
-    
-    ' Check if an image was selected
-    If strImagePath = "False" Then
-        MsgBox "No image file selected."
-        Exit Sub
-    End If
-    
-    ' Create a new Word document
-    Dim objWord As Object
-    Set objWord = CreateObject("Word.Application")
-    objWord.Visible = True
-    Dim objDoc As Object
-    Set objDoc = objWord.Documents.Add
-    
-    ' Insert the image into the Word document
-    objDoc.InlineShapes.AddPicture Filename:=strImagePath, LinkToFile:=False, SaveWithDocument:=True
-    
-    ' Clean up
-    Set objDoc = Nothing
-    objWord.Quit
-    Set objWord = Nothing
+class Program
+{
+    static void Main(string[] args)
+    {
+        int[] myList = { 1, 2, 3 };
+        var combinations = GetCombinations(myList);
 
-End Sub
+        foreach (var combination in combinations)
+        {
+            Console.WriteLine(string.Join(",", combination));
+        }
+    }
+
+    static List<int[]> GetCombinations(int[] list)
+    {
+        var combinations = new List<int[]>();
+        GenerateCombinations(list, 0, new int[list.Length], combinations);
+        return combinations;
+    }
+
+    static void GenerateCombinations(int[] list, int index, int[] buffer, List<int[]> combinations)
+    {
+        if (index == list.Length)
+        {
+            combinations.Add(buffer.ToArray());
+            return;
+        }
+
+        for (int i = 0; i < list.Length; i++)
+        {
+            if (!buffer.Contains(list[i]))
+            {
+                buffer[index] = list[i];
+                GenerateCombinations(list, index + 1, buffer, combinations);
+            }
+        }
+    }
+}
