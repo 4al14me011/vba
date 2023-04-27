@@ -1,45 +1,52 @@
-Function GetCombinations(list() As String) As Variant
-    Dim n As Integer
-    n = UBound(list) + 1
-    
-    If n = 0 Then
-        GetCombinations = Array(Array())
-    ElseIf n = 1 Then
-        GetCombinations = Array(list)
-    Else
-        Dim head As String
-        head = list(0)
-        
-        Dim tail() As String
-        ReDim tail(n - 2)
-        Dim i As Integer
-        For i = 1 To n - 1
-            tail(i - 1) = list(i)
-        Next i
-        
-        Dim subcombinations As Variant
-        subcombinations = GetCombinations(tail)
-        
-        Dim num_subcombinations As Integer
-        num_subcombinations = UBound(subcombinations) + 1
-        
-        Dim combinations() As Variant
-        ReDim combinations(num_subcombinations - 1)
-        Dim j As Integer
-        For j = 0 To num_subcombinations - 1
-            Dim subcombination() As String
-            subcombination = subcombinations(j)
-            
-            Dim k As Integer
-            ReDim combination(n - 1)
-            combination(0) = head
-            For k = 1 To n - 1
-                combination(k) = subcombination(k - 1)
-            Next k
-            
-            combinations(j) = combination
+Sub Main()
+    Dim list As Variant
+    list = Array("a", "s", "h")
+    Dim combinations As Variant
+    combinations = GetCombinations(list)
+    Dim i As Long, j As Long
+    For i = 0 To UBound(combinations)
+        For j = 0 To UBound(combinations(i))
+            Debug.Print combinations(i)(j);
+            If j < UBound(combinations(i)) Then Debug.Print ", ";
         Next j
-        
-        GetCombinations = combinations
+        Debug.Print
+    Next i
+End Sub
+
+Function GetCombinations(list As Variant) As Variant
+    Dim combinations As Variant
+    ReDim combinations(0 To 0)
+    Dim temp() As Variant
+    ReDim temp(0 To UBound(list))
+    Dim start As Long
+    start = 0
+    Backtrack combinations, temp, list, start
+    GetCombinations = combinations
+End Function
+
+Sub Backtrack(ByRef combinations As Variant, ByRef temp() As Variant, list As Variant, start As Long)
+    If UBound(temp) = UBound(list) Then
+        combinations(UBound(combinations)) = temp
+        ReDim Preserve combinations(0 To UBound(combinations) + 1)
+        Exit Sub
     End If
+    Dim i As Long
+    For i = start To UBound(list)
+        If Not IsInArray(list(i), temp) Then
+            temp(UBound(temp) - (UBound(list) - i)) = list(i)
+            Backtrack combinations, temp, list, i + 1
+            temp(UBound(temp) - (UBound(list) - i)) = Empty
+        End If
+    Next i
+End Sub
+
+Function IsInArray(value As Variant, arr As Variant) As Boolean
+    Dim i As Long
+    For i = LBound(arr) To UBound(arr)
+        If value = arr(i) Then
+            IsInArray = True
+            Exit Function
+        End If
+    Next i
+    IsInArray = False
 End Function
