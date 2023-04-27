@@ -6,7 +6,7 @@ class Program
 {
     static void Main(string[] args)
     {
-        int[] myList = { 1, 2, 3 };
+        List<string> myList = new List<string>{ "s", "a", "l", "y", "h", "e" };
         var combinations = GetCombinations(myList);
 
         foreach (var combination in combinations)
@@ -15,27 +15,28 @@ class Program
         }
     }
 
-    static List<int[]> GetCombinations(int[] list)
+    static List<List<T>> GetCombinations<T>(List<T> list)
     {
-        var combinations = new List<int[]>();
-        GenerateCombinations(list, 0, new int[list.Length], combinations);
+        var combinations = new List<List<T>>();
+        GenerateCombinations(list, 0, new List<T>(), combinations);
         return combinations;
     }
 
-    static void GenerateCombinations(int[] list, int index, int[] buffer, List<int[]> combinations)
+    static void GenerateCombinations<T>(List<T> list, int index, List<T> buffer, List<List<T>> combinations)
     {
-        if (index == list.Length)
+        if (index == list.Count)
         {
-            combinations.Add(buffer.ToArray());
+            combinations.Add(buffer.ToList());
             return;
         }
 
-        for (int i = 0; i < list.Length; i++)
+        for (int i = 0; i < list.Count; i++)
         {
             if (!buffer.Contains(list[i]))
             {
-                buffer[index] = list[i];
+                buffer.Add(list[i]);
                 GenerateCombinations(list, index + 1, buffer, combinations);
+                buffer.RemoveAt(buffer.Count - 1);
             }
         }
     }
