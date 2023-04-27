@@ -1,0 +1,43 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+class Program
+{
+    static void Main(string[] args)
+    {
+        var myList = new List<string>{ "s", "a", "l", "y", "h", "e" };
+        var combinations = GetCombinations(myList);
+
+        foreach (var combination in combinations)
+        {
+            Console.WriteLine(string.Join(",", combination));
+        }
+    }
+
+    static List<List<T>> GetCombinations<T>(List<T> list)
+    {
+        if (list.Count == 0)
+        {
+            return new List<List<T>> { new List<T>() };
+        }
+
+        var head = list[0];
+        var tail = list.Skip(1).ToList();
+        var tailCombinations = GetCombinations(tail);
+
+        var result = new List<List<T>>();
+        result.AddRange(tailCombinations);
+        foreach (var tailCombination in tailCombinations)
+        {
+            for (int i = 0; i <= tailCombination.Count; i++)
+            {
+                var combination = new List<T>(tailCombination);
+                combination.Insert(i, head);
+                result.Add(combination);
+            }
+        }
+
+        return result;
+    }
+}
