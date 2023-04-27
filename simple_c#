@@ -1,68 +1,45 @@
-Sub Main()
-    Dim myList As Variant
-    myList = Array("s", "a", "l", "y", "h", "e")
-    
-    Dim combinations As Variant
-    combinations = GetCombinations(myList)
-    
-    Dim i As Integer, j As Integer
-    For i = 0 To UBound(combinations)
-        Debug.Print Join(combinations(i), ",")
-    Next i
-End Sub
-
-Function GetCombinations(ByVal list As Variant) As Variant
+Function GetCombinations(list() As String) As Variant
     Dim n As Integer
-    n = UBound(list) - LBound(list) + 1
+    n = UBound(list) + 1
     
     If n = 0 Then
         GetCombinations = Array(Array())
-        Exit Function
-    End If
-    
-    Dim head As Variant
-    head = list(LBound(list))
-    
-    Dim tail As Variant
-    ReDim tail(n - 2)
-    Dim i As Integer
-    For i = LBound(tail) To UBound(tail)
-        tail(i) = list(i + 1)
-    Next i
-    
-    Dim tailCombinations As Variant
-    tailCombinations = GetCombinations(tail)
-    
-    Dim result As Variant
-    ReDim result(UBound(tailCombinations) * n)
-    
-    Dim k As Integer
-    k = 0
-    
-    Dim i As Integer, j As Integer
-    For i = LBound(tailCombinations) To UBound(tailCombinations)
-        Dim tailCombination As Variant
-        tailCombination = tailCombinations(i)
+    ElseIf n = 1 Then
+        GetCombinations = Array(list)
+    Else
+        Dim head As String
+        head = list(0)
         
-        For j = 0 To UBound(tailCombination) + 1
-            Dim combination As Variant
+        Dim tail() As String
+        ReDim tail(n - 2)
+        Dim i As Integer
+        For i = 1 To n - 1
+            tail(i - 1) = list(i)
+        Next i
+        
+        Dim subcombinations As Variant
+        subcombinations = GetCombinations(tail)
+        
+        Dim num_subcombinations As Integer
+        num_subcombinations = UBound(subcombinations) + 1
+        
+        Dim combinations() As Variant
+        ReDim combinations(num_subcombinations - 1)
+        Dim j As Integer
+        For j = 0 To num_subcombinations - 1
+            Dim subcombination() As String
+            subcombination = subcombinations(j)
+            
+            Dim k As Integer
             ReDim combination(n - 1)
+            combination(0) = head
+            For k = 1 To n - 1
+                combination(k) = subcombination(k - 1)
+            Next k
             
-            Dim l As Integer
-            For l = 0 To j - 1
-                combination(l) = tailCombination(l)
-            Next l
-            
-            combination(j) = head
-            
-            For l = j To UBound(tailCombination)
-                combination(l + 1) = tailCombination(l)
-            Next l
-            
-            result(k) = combination
-            k = k + 1
+            combinations(j) = combination
         Next j
-    Next i
-    
-    GetCombinations = result
+        
+        GetCombinations = combinations
+    End If
 End Function
