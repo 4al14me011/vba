@@ -1,43 +1,36 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
+Imports System
+Imports System.Collections.Generic
+Imports System.Linq
 
-class Program
-{
-    static void Main(string[] args)
-    {
-        var myList = new List<string>{ "s", "a", "l", "y", "h", "e" };
-        var combinations = GetCombinations(myList);
+Module Module1
+    Sub Main()
+        Dim myList As New List(Of String) From {"s", "a", "l", "y", "h", "e"}
+        Dim combinations = GetCombinations(myList)
 
-        foreach (var combination in combinations)
-        {
-            Console.WriteLine(string.Join(",", combination));
-        }
-    }
+        For Each combination In combinations
+            Console.WriteLine(String.Join(",", combination))
+        Next
+    End Sub
 
-    static List<List<T>> GetCombinations<T>(List<T> list)
-    {
-        if (list.Count == 0)
-        {
-            return new List<List<T>> { new List<T>() };
-        }
+    Function GetCombinations(Of T)(ByVal list As List(Of T)) As List(Of List(Of T))
+        If list.Count = 0 Then
+            Return New List(Of List(Of T)) From {New List(Of T)}
+        End If
 
-        var head = list[0];
-        var tail = list.Skip(1).ToList();
-        var tailCombinations = GetCombinations(tail);
+        Dim head = list(0)
+        Dim tail = list.Skip(1).ToList()
+        Dim tailCombinations = GetCombinations(tail)
 
-        var result = new List<List<T>>();
-        result.AddRange(tailCombinations);
-        foreach (var tailCombination in tailCombinations)
-        {
-            for (int i = 0; i <= tailCombination.Count; i++)
-            {
-                var combination = new List<T>(tailCombination);
-                combination.Insert(i, head);
-                result.Add(combination);
-            }
-        }
+        Dim result As New List(Of List(Of T))
+        result.AddRange(tailCombinations)
+        For Each tailCombination In tailCombinations
+            For i As Integer = 0 To tailCombination.Count
+                Dim combination As New List(Of T)(tailCombination)
+                combination.Insert(i, head)
+                result.Add(combination)
+            Next
+        Next
 
-        return result;
-    }
-}
+        Return result
+    End Function
+End Module
