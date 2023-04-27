@@ -1,36 +1,64 @@
-Imports System
-Imports System.Collections.Generic
-Imports System.Linq
+Sub Main()
+    Dim myList As Variant
+    myList = Array("s", "a", "l", "y", "h", "e")
+    
+    Dim combinations As Variant
+    combinations = GetCombinations(myList)
+    
+    Dim i As Integer, j As Integer
+    For i = 0 To UBound(combinations)
+        Debug.Print Join(combinations(i), ",")
+    Next i
+End Sub
 
-Module Module1
-    Sub Main()
-        Dim myList As New List(Of String) From {"s", "a", "l", "y", "h", "e"}
-        Dim combinations = GetCombinations(myList)
-
-        For Each combination In combinations
-            Console.WriteLine(String.Join(",", combination))
-        Next
-    End Sub
-
-    Function GetCombinations(Of T)(ByVal list As List(Of T)) As List(Of List(Of T))
-        If list.Count = 0 Then
-            Return New List(Of List(Of T)) From {New List(Of T)}
-        End If
-
-        Dim head = list(0)
-        Dim tail = list.Skip(1).ToList()
-        Dim tailCombinations = GetCombinations(tail)
-
-        Dim result As New List(Of List(Of T))
-        result.AddRange(tailCombinations)
-        For Each tailCombination In tailCombinations
-            For i As Integer = 0 To tailCombination.Count
-                Dim combination As New List(Of T)(tailCombination)
-                combination.Insert(i, head)
-                result.Add(combination)
-            Next
-        Next
-
-        Return result
-    End Function
-End Module
+Function GetCombinations(ByVal list As Variant) As Variant
+    Dim n As Integer
+    n = UBound(list) - LBound(list) + 1
+    
+    If n = 0 Then
+        GetCombinations = Array(Array())
+        Exit Function
+    End If
+    
+    Dim head As Variant
+    head = list(LBound(list))
+    
+    Dim tail As Variant
+    tail = Mid(list, LBound(list) + 1)
+    
+    Dim tailCombinations As Variant
+    tailCombinations = GetCombinations(tail)
+    
+    Dim result As Variant
+    ReDim result(UBound(tailCombinations) * (n - 1))
+    
+    Dim k As Integer
+    k = 0
+    
+    Dim i As Integer, j As Integer
+    For i = LBound(tailCombinations) To UBound(tailCombinations)
+        Dim tailCombination As Variant
+        tailCombination = tailCombinations(i)
+        
+        For j = 0 To UBound(tailCombination) + 1
+            Dim combination As Variant
+            ReDim combination(UBound(tailCombination) + 1)
+            
+            Dim l As Integer
+            For l = 0 To j - 1
+                combination(l) = tailCombination(l)
+            Next l
+            
+            combination(j) = head
+            
+            For l = j To UBound(tailCombination)
+                combination(l + 1) = tailCombination(l)
+            Next l
+            
+            result(k) = combination
+            k = k + 1
+        Next j
+    Next i
+    
+    GetCombinations = result
+End Function
