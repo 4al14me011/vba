@@ -1,0 +1,38 @@
+Sub SplitRowsIntoSheets()
+    Dim sourceSheet As Worksheet
+    Set sourceSheet = ThisWorkbook.Sheets("Sheet1") ' Replace "Sheet1" with the name of your source sheet
+
+    Dim sourceRange As Range
+    Set sourceRange = sourceSheet.Range("A1").CurrentRegion ' Assumes data starts from cell A1 and has headers
+
+    Dim totalRows As Long
+    totalRows = sourceRange.Rows.Count
+
+    Dim numRowsPerSheet As Long
+    numRowsPerSheet = 200 ' Number of rows per sheet
+
+    Dim numSets As Long
+    numSets = Application.WorksheetFunction.Ceiling(totalRows / numRowsPerSheet, 1)
+
+    Dim currentRow As Long
+    currentRow = 2 ' Starting row in the source sheet (excluding header)
+
+    For setIndex = 1 To numSets
+        Dim newSheet As Worksheet
+        Set newSheet = ThisWorkbook.Sheets.Add(After:=ThisWorkbook.Sheets(ThisWorkbook.Sheets.Count))
+        newSheet.Name = "Set" & setIndex ' Set sheet name as "Set1", "Set2", etc.
+
+        sourceRange.Copy newSheet.Range("A1") ' Copy headers
+
+        Dim rowsToCopy As Long
+        rowsToCopy = Application.WorksheetFunction.Min(numRowsPerSheet, totalRows - currentRow + 1)
+
+        sourceRange.Offset(currentRow - 1).Resize(rowsToCopy).Copy newSheet.Range("A2") ' Copy data
+
+        currentRow = currentRow + rowsToCopy
+    Next setIndex
+
+    Application.DisplayAlerts = False
+    sourceSheet.Delete ' Optionally, delete the source sheet if desired
+    Application.DisplayAlerts = True
+End Sub
