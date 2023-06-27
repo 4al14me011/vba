@@ -1,1 +1,27 @@
+Dim cntr As Integer
+cntr = 0
 
+Dim str_temp2 As String
+str_temp2 = ""
+str_temp= ""
+
+For Each rw As DataRow In dt.Rows
+		For Each cell In rw.ItemArray
+				If str_temp = "" Then
+					str_temp = chr(34)+dt.Columns(cntr).ColumnName+ chr(34)+ ":"+cell.ToString
+				Else
+					str_temp = str_temp+", "+ chr(34)+dt.Columns(cntr).ColumnName+chr(34) + ":"+cell.ToString
+				End If
+				
+				cntr = cntr +1
+		Next
+		
+		If str_temp2 = "" Then
+			str_temp2 = "{"+str_temp+"}"
+		Else
+			str_temp2 =str_temp2 +","+environment.NewLine+ "{"+str_temp+"}"
+		End If
+		cntr = 0
+Next
+
+str_temp = str_temp2
